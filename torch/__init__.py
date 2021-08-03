@@ -705,6 +705,7 @@ import torch.backends.mkl
 import torch.backends.mkldnn
 import torch.backends.openmp
 import torch.backends.quantized
+import torch.backends.rocm
 from torch import quantization as quantization
 import torch.utils.data
 from torch import __config__ as __config__
