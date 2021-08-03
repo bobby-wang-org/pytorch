@@ -211,6 +211,11 @@ class TORCH_API Context {
   void setDefaultMobileCPUAllocator();
   void unsetDefaultMobileCPUAllocator();
 
+  bool allowF8MIOpen() const;
+  void setAllowF8MIOpen(bool);
+  bool allowF8RocBLAS() const;
+  void setAllowF8RocBLAS(bool);
+
  private:
   void initCUDAIfNeeded(DeviceType p) {
     if (p == DeviceType::CUDA) {
@@ -238,6 +243,8 @@ class TORCH_API Context {
   bool release_original_weights = false;
   #endif
   bool display_vmap_fallback_warnings_ = false;
+  bool allow_f8_miopen = false;
+  bool allow_f8_rocblas = false;
   c10::optional<at::QEngine> quantized_engine = c10::nullopt;
   std::unique_ptr<THCState, void(*)(THCState*)> thc_state;
   std::unique_ptr<THHState, void(*)(THHState*)> thh_state;

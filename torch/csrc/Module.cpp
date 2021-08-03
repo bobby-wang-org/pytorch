@@ -625,6 +625,34 @@ PyObject *THPModule_unsetDefaultMobileCPUAllocator(PyObject *_unused, PyObject *
   Py_RETURN_NONE;
 }
 
+PyObject *THPModule_setAllowF8RocBLAS(PyObject *_unused, PyObject *arg)
+{
+  THPUtils_assert(PyBool_Check(arg), "set_rocm_rocblas_allow_f8 expects a bool, "
+          "but got %s", THPUtils_typename(arg));
+  at::globalContext().setAllowF8RocBLAS(arg == Py_True);
+  Py_RETURN_NONE;
+}
+
+PyObject *THPModule_allowF8RocBLAS(PyObject *_unused, PyObject *noargs)
+{
+  if (at::globalContext().allowF8RocBLAS()) Py_RETURN_TRUE;
+  else Py_RETURN_FALSE;
+}
+
+PyObject *THPModule_setAllowF8MIOpen(PyObject *_unused, PyObject *arg)
+{
+  THPUtils_assert(PyBool_Check(arg), "set_rocm_miopen_allow_f8 expects a bool, "
+          "but got %s", THPUtils_typename(arg));
+  at::globalContext().setAllowF8MIOpen(arg == Py_True);
+  Py_RETURN_NONE;
+}
+
+PyObject *THPModule_allowF8MIOpen(PyObject *_unused, PyObject *noargs)
+{
+  if (at::globalContext().allowF8MIOpen()) Py_RETURN_TRUE;
+  else Py_RETURN_FALSE;
+}
+
 static PyObject * THPModule_vmapmode_increment_nesting(PyObject* _unused, PyObject *arg) {
   HANDLE_TH_ERRORS
   return THPUtils_packInt64(at::impl::VmapMode::increment_nesting());
@@ -711,6 +739,10 @@ static PyMethodDef TorchMethods[] = {
   {"_is_xnnpack_enabled", THPModule_isEnabledXNNPACK, METH_NOARGS, nullptr},
   {"_set_default_mobile_cpu_allocator", THPModule_setDefaultMobileCPUAllocator, METH_NOARGS, nullptr},
   {"_unset_default_mobile_cpu_allocator", THPModule_unsetDefaultMobileCPUAllocator, METH_NOARGS, nullptr},
+  {"_get_rocm_rocblas_allow_f8", THPModule_allowF8RocBLAS, METH_NOARGS, nullptr},
+  {"_set_rocm_rocblas_allow_f8", THPModule_setAllowF8RocBLAS, METH_O, nullptr},
+  {"_get_rocm_miopen_allow_f8", THPModule_allowF8MIOpen, METH_NOARGS, nullptr},
+  {"_set_rocm_miopen_allow_f8", THPModule_setAllowF8MIOpen, METH_O, nullptr},
   {"_is_torch_function_enabled", THPModule_isEnabledTorchFunction, METH_NOARGS, nullptr},
   {"_disabled_torch_function_impl", THPModule_disable_torch_function, METH_VARARGS, nullptr},
   {"_has_torch_function", THPModule_has_torch_function, METH_O, nullptr},

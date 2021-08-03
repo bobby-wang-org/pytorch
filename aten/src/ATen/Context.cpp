@@ -287,4 +287,20 @@ void Context::unsetDefaultMobileCPUAllocator() {
   c10::SetCPUAllocator(prev_allocator_ptr_ , /*priority*/ 100);
   prev_allocator_ptr_ = nullptr;
 }
+
+bool Context::allowF8MIOpen() const {
+  return allow_f8_miopen;
+}
+
+void Context::setAllowF8MIOpen(bool b) {
+  allow_f8_miopen = b;
+}
+
+bool Context::allowF8RocBLAS() const {
+  return allow_f8_rocblas;
+}
+
+void Context::setAllowF8RocBLAS(bool b) {
+  allow_f8_rocblas = b;
+}
 } // namespace at
