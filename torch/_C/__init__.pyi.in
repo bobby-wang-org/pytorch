@@ -551,6 +551,10 @@ def _supported_qengines() -> List[_int]: ...  # THPModule_supportedQEngines
 def _is_xnnpack_enabled() -> _bool: ...  # THPModule_isEnabledXNNPACK
 def _set_default_mobile_cpu_allocator() -> None: ...  # THPModule_setDefaultMobileCPUAllocator
 def _unset_default_mobile_cpu_allocator() -> None: ...  # THPModule_unsetDefaultMobileCPUAllocator
+def _get_rocm_rocblas_allow_f8() -> _bool: ...  # THPModule_allowF8RocBLAS
+def _set_rocm_rocblas_allow_f8(arg: _bool) -> None: ...  # THPModule_setAllowF8RocBLAS
+def _get_rocm_miopen_allow_f8() -> _bool: ...  # THPModule_allowF8MIOpen
+def _set_rocm_miopen_allow_f8(arg: _bool) -> None: ...  # THPModule_setAllowF8MIOpen
 def _is_torch_function_enabled() -> _bool: ...  # THPModule_isEnabledTorchFunction
 def _has_torch_function(args: Iterable[Any]) -> _bool: ...  # THPModule_has_torch_function
 def _has_torch_function_unary(Any) -> _bool: ...  # THPModule_has_torch_function_unary
