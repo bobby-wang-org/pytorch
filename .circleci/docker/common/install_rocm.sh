@@ -59,6 +59,9 @@ install_ubuntu() {
         # Add amdgpu repository
         UBUNTU_VERSION_NAME=`cat /etc/os-release | grep UBUNTU_CODENAME | awk -F= '{print $2}'`
         local amdgpu_baseurl="https://repo.radeon.com/amdgpu/${AMDGPU_VERSIONS[$ROCM_VERSION]}/ubuntu"
+        [[ $(ver $ROCM_VERSION) -ge $(ver 5.3) ]] && \
+            amdgpu_baseurl="https://repo.radeon.com/amdgpu/.${ROCM_VERSION}/ubuntu"
+        #    amdgpu_baseurl="https://repo.radeon.com/amdgpu/${ROCM_VERSION}/ubuntu"
         echo "deb [arch=amd64] ${amdgpu_baseurl} ${UBUNTU_VERSION_NAME} main" > /etc/apt/sources.list.d/amdgpu.list
     fi
 
@@ -69,7 +72,8 @@ install_ubuntu() {
 
     # Add rocm repository
     wget -qO - http://repo.radeon.com/rocm/rocm.gpg.key | apt-key add -
-    local rocm_baseurl="http://repo.radeon.com/rocm/apt/${ROCM_VERSION}"
+    #local rocm_baseurl="http://repo.radeon.com/rocm/apt/${ROCM_VERSION}"
+    local rocm_baseurl="http://repo.radeon.com/rocm/apt/.apt_${ROCM_VERSION}"
     echo "deb [arch=amd64] ${rocm_baseurl} ${ROCM_REPO} main" > /etc/apt/sources.list.d/rocm.list
     apt-get update --allow-insecure-repositories
 
@@ -118,7 +122,9 @@ install_centos() {
       if [[ $OS_VERSION == 9 ]]; then
           local amdgpu_baseurl="https://repo.radeon.com/amdgpu/${AMDGPU_VERSIONS[$ROCM_VERSION]}/rhel/9.0/main/x86_64"
       else
-	  local amdgpu_baseurl="https://repo.radeon.com/amdgpu/${AMDGPU_VERSIONS[$ROCM_VERSION]}/rhel/7.9/main/x86_64"
+	  #local amdgpu_baseurl="https://repo.radeon.com/amdgpu/${AMDGPU_VERSIONS[$ROCM_VERSION]}/rhel/7.9/main/x86_64"
+	  #local amdgpu_baseurl="https://repo.radeon.com/amdgpu/${$ROCM_VERSION}/rhel/7.9/main/x86_64"
+	  local amdgpu_baseurl="https://repo.radeon.com/amdgpu/.${$ROCM_VERSION}/rhel/7.9/main/x86_64"
       fi
       echo "[AMDGPU]" > /etc/yum.repos.d/amdgpu.repo
       echo "name=AMDGPU" >> /etc/yum.repos.d/amdgpu.repo
@@ -131,7 +137,8 @@ install_centos() {
   if [[ $OS_VERSION == 9 ]]; then
       local rocm_baseurl="invalid-url"
   else
-      local rocm_baseurl="http://repo.radeon.com/rocm/yum/${ROCM_VERSION}/main"
+      #local rocm_baseurl="http://repo.radeon.com/rocm/yum/${ROCM_VERSION}/main"
+      local rocm_baseurl="http://repo.radeon.com/rocm/yum/.yum_${ROCM_VERSION}/main"
   fi
   echo "[ROCm]" > /etc/yum.repos.d/rocm.repo
   echo "name=ROCm" >> /etc/yum.repos.d/rocm.repo
