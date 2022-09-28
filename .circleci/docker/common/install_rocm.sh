@@ -58,9 +58,10 @@ install_ubuntu() {
     if [[ $(ver $ROCM_VERSION) -ge $(ver 4.5) ]]; then
         # Add amdgpu repository
         UBUNTU_VERSION_NAME=`cat /etc/os-release | grep UBUNTU_CODENAME | awk -F= '{print $2}'`
-        local amdgpu_baseurl="https://repo.radeon.com/amdgpu/${AMDGPU_VERSIONS[$ROCM_VERSION]}/ubuntu"
+        local amdgpu_baseurl
         [[ $(ver $ROCM_VERSION) -ge $(ver 5.3) ]] && \
-            amdgpu_baseurl="https://repo.radeon.com/amdgpu/.${ROCM_VERSION}/ubuntu"
+            amdgpu_baseurl="https://repo.radeon.com/amdgpu/.${ROCM_VERSION}/ubuntu" || \
+            amdgpu_baseurl="https://repo.radeon.com/amdgpu/${AMDGPU_VERSIONS[$ROCM_VERSION]}/ubuntu"
         #    amdgpu_baseurl="https://repo.radeon.com/amdgpu/${ROCM_VERSION}/ubuntu"
         echo "deb [arch=amd64] ${amdgpu_baseurl} ${UBUNTU_VERSION_NAME} main" > /etc/apt/sources.list.d/amdgpu.list
     fi
