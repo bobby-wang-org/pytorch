@@ -35,7 +35,8 @@ ver() {
 }
 
 # Map ROCm version to AMDGPU version
-declare -A AMDGPU_VERSIONS=( ["4.5.2"]="21.40.2" ["5.0"]="21.50" ["5.1.1"]="22.10.1" ["5.2"]="22.20" )
+declare -A AMDGPU_VERSIONS=( ["5.2.3"]="22.20.3" )
+declare -A AMDGPU_VERSIONS=( ["4.5.2"]="21.40.2" ["5.0"]="21.50" ["5.1.1"]="22.10.1" ["5.2"]="22.20" ["5.2.3"]="22.20.3")
 
 install_ubuntu() {
     apt-get update
@@ -57,7 +58,11 @@ install_ubuntu() {
     if [[ $(ver $ROCM_VERSION) -ge $(ver 4.5) ]]; then
         # Add amdgpu repository
         UBUNTU_VERSION_NAME=`cat /etc/os-release | grep UBUNTU_CODENAME | awk -F= '{print $2}'`
-        local amdgpu_baseurl="https://repo.radeon.com/amdgpu/${AMDGPU_VERSIONS[$ROCM_VERSION]}/ubuntu"
+        local amdgpu_baseurl
+        [[ $(ver $ROCM_VERSION) -ge $(ver 5.3) ]] && \
+            amdgpu_baseurl="https://repo.radeon.com/amdgpu/.${ROCM_VERSION}/ubuntu" || \
+            amdgpu_baseurl="https://repo.radeon.com/amdgpu/${AMDGPU_VERSIONS[$ROCM_VERSION]}/ubuntu"
+        #    amdgpu_baseurl="https://repo.radeon.com/amdgpu/${ROCM_VERSION}/ubuntu"
         echo "deb [arch=amd64] ${amdgpu_baseurl} ${UBUNTU_VERSION_NAME} main" > /etc/apt/sources.list.d/amdgpu.list
     fi
 
@@ -68,7 +73,8 @@ install_ubuntu() {
 
     # Add rocm repository
     wget -qO - http://repo.radeon.com/rocm/rocm.gpg.key | apt-key add -
-    local rocm_baseurl="http://repo.radeon.com/rocm/apt/${ROCM_VERSION}"
+    #local rocm_baseurl="http://repo.radeon.com/rocm/apt/${ROCM_VERSION}"
+    local rocm_baseurl="http://repo.radeon.com/rocm/apt/.apt_${ROCM_VERSION}"
     echo "deb [arch=amd64] ${rocm_baseurl} ${ROCM_REPO} main" > /etc/apt/sources.list.d/rocm.list
     apt-get update --allow-insecure-repositories
 
@@ -117,7 +123,9 @@ install_centos() {
       if [[ $OS_VERSION == 9 ]]; then
           local amdgpu_baseurl="https://repo.radeon.com/amdgpu/${AMDGPU_VERSIONS[$ROCM_VERSION]}/rhel/9.0/main/x86_64"
       else
-	  local amdgpu_baseurl="https://repo.radeon.com/amdgpu/${AMDGPU_VERSIONS[$ROCM_VERSION]}/rhel/7.9/main/x86_64"
+	  #local amdgpu_baseurl="https://repo.radeon.com/amdgpu/${AMDGPU_VERSIONS[$ROCM_VERSION]}/rhel/7.9/main/x86_64"
+	  #local amdgpu_baseurl="https://repo.radeon.com/amdgpu/${$ROCM_VERSION}/rhel/7.9/main/x86_64"
+	  local amdgpu_baseurl="https://repo.radeon.com/amdgpu/.${$ROCM_VERSION}/rhel/7.9/main/x86_64"
       fi
       echo "[AMDGPU]" > /etc/yum.repos.d/amdgpu.repo
       echo "name=AMDGPU" >> /etc/yum.repos.d/amdgpu.repo
@@ -130,7 +138,8 @@ install_centos() {
   if [[ $OS_VERSION == 9 ]]; then
       local rocm_baseurl="invalid-url"
   else
-      local rocm_baseurl="http://repo.radeon.com/rocm/yum/${ROCM_VERSION}/main"
+      #local rocm_baseurl="http://repo.radeon.com/rocm/yum/${ROCM_VERSION}/main"
+      local rocm_baseurl="http://repo.radeon.com/rocm/yum/.yum_${ROCM_VERSION}/main"
   fi
   echo "[ROCm]" > /etc/yum.repos.d/rocm.repo
   echo "name=ROCm" >> /etc/yum.repos.d/rocm.repo
@@ -154,15 +163,6 @@ install_centos() {
                    roctracer-dev
   fi
 
-  # if search fails it will abort this script; use true to avoid case where search fails
-  MIOPENKERNELS=$(yum -q search miopenkernels | grep miopenkernels- | awk '{print $1}'| grep -F kdb. || true)
-  if [[ "x${MIOPENKERNELS}" = x ]]; then
-    echo "miopenkernels package not available"
-  else
-    yum install -y ${MIOPENKERNELS}
-  fi
-
-  # precompiled miopen kernels; search for all unversioned packages
   # if search fails it will abort this script; use true to avoid case where search fails
   MIOPENKERNELS=$(yum -q search miopenkernels | grep miopenkernels- | awk '{print $1}'| grep -F kdb. || true)
   if [[ "x${MIOPENKERNELS}" = x ]]; then
